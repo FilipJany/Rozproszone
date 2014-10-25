@@ -12,6 +12,7 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JList;
 import javax.swing.JTextArea;
+import javax.swing.JTextField;
 import javax.swing.SpringLayout;
 
 /**
@@ -25,13 +26,10 @@ public class FrameMain
     private JFrame mainFrame;
     private Container contentPane;
     private JTextArea mainArea;
-    private JList contactList;
+    private JTextField messageField;
     
-    private List<String> contactStringList;
     
-    private Object[] items = {"1", "2", "3"};
-    
-    private JButton beginChatButton, endButton;
+    private JButton beginChatButton, endChatButton, joinChatButton, sendButton;
     
     public FrameMain(int width, int height)
     {
@@ -57,34 +55,56 @@ public class FrameMain
         layout = new SpringLayout();
         contentPane.setLayout(layout);
         
-        mainArea = new JTextArea(75, 75);
-        contactList = new JList(items);
-        beginChatButton = new JButton("Chat");
-        beginChatButton.setPreferredSize(new Dimension(100, 40));
-        endButton = new JButton("Disconnect");
-        endButton.setPreferredSize(new Dimension(100, 40));
+        mainArea = new JTextArea();
+        mainArea.setPreferredSize(new Dimension(580, 320));
+        mainArea.setEditable(false);
+        messageField = new JTextField();
+        messageField.setPreferredSize(new Dimension(380, 40));
+        messageField.setEditable(false);
+        sendButton = new JButton("Send");
+        sendButton.setPreferredSize(new Dimension(100, 40));
+        sendButton.setEnabled(false);
+        beginChatButton = new JButton("Start Chat");
+        beginChatButton.setPreferredSize(new Dimension(150, 40));
+        joinChatButton = new JButton("Join Chat");
+        joinChatButton.setPreferredSize(new Dimension(150, 40));
+        endChatButton = new JButton("Disconnect");
+        endChatButton.setPreferredSize(new Dimension(150, 40));
+        endChatButton.setEnabled(false);
         
         contentPane.add(mainArea);
-        contentPane.add(contactList);
+        contentPane.add(messageField);
+        contentPane.add(sendButton);
         contentPane.add(beginChatButton);
-        contentPane.add(endButton);
+        contentPane.add(joinChatButton);
+        contentPane.add(endChatButton);
         
         layout.putConstraint(SpringLayout.WEST, mainArea, 10, SpringLayout.WEST, contentPane);
         layout.putConstraint(SpringLayout.NORTH, mainArea, 10, SpringLayout.NORTH, contentPane);
-        layout.putConstraint(SpringLayout.EAST, mainArea, -160, SpringLayout.EAST, contentPane);
-        layout.putConstraint(SpringLayout.SOUTH, mainArea, -60, SpringLayout.SOUTH, contentPane);
+        layout.putConstraint(SpringLayout.EAST, mainArea, -10, SpringLayout.EAST, contentPane);
+        layout.putConstraint(SpringLayout.SOUTH, mainArea, -120, SpringLayout.SOUTH, contentPane);
         
-        layout.putConstraint(SpringLayout.WEST, contactList, 10, SpringLayout.EAST, mainArea);
-        layout.putConstraint(SpringLayout.NORTH, contactList, 10, SpringLayout.NORTH, contentPane);
-        layout.putConstraint(SpringLayout.EAST, contactList, -10, SpringLayout.EAST, contentPane);
-        layout.putConstraint(SpringLayout.SOUTH, contactList, -10, SpringLayout.SOUTH, contentPane);
+        layout.putConstraint(SpringLayout.WEST, messageField, 10, SpringLayout.WEST, contentPane);
+        layout.putConstraint(SpringLayout.NORTH, messageField, 10, SpringLayout.SOUTH, mainArea);
+        layout.putConstraint(SpringLayout.EAST, messageField, -120, SpringLayout.EAST, contentPane);
+        layout.putConstraint(SpringLayout.SOUTH, messageField, -60, SpringLayout.SOUTH, contentPane);
         
-        layout.putConstraint(SpringLayout.NORTH, beginChatButton, 10, SpringLayout.SOUTH, mainArea);
-        layout.putConstraint(SpringLayout.EAST, beginChatButton, -10, SpringLayout.WEST, contactList);
-        layout.putConstraint(SpringLayout.SOUTH, contactList, -10, SpringLayout.SOUTH, contentPane);
+        layout.putConstraint(SpringLayout.WEST, sendButton, 10, SpringLayout.EAST, messageField);
+        layout.putConstraint(SpringLayout.NORTH, sendButton, 15, SpringLayout.SOUTH, mainArea);
+        layout.putConstraint(SpringLayout.EAST, sendButton, -10, SpringLayout.EAST, contentPane);
+        layout.putConstraint(SpringLayout.SOUTH, messageField, -55, SpringLayout.SOUTH, contentPane);
         
-        layout.putConstraint(SpringLayout.NORTH, endButton, 10, SpringLayout.SOUTH, mainArea);
-        layout.putConstraint(SpringLayout.EAST, endButton, -10, SpringLayout.WEST, beginChatButton);
-        layout.putConstraint(SpringLayout.SOUTH, endButton, -10, SpringLayout.SOUTH, contentPane);
+        layout.putConstraint(SpringLayout.WEST, beginChatButton, 30, SpringLayout.WEST, contentPane);
+        layout.putConstraint(SpringLayout.NORTH, beginChatButton, 10, SpringLayout.SOUTH, messageField);
+        layout.putConstraint(SpringLayout.EAST, beginChatButton, 130, SpringLayout.WEST, contentPane);
+        layout.putConstraint(SpringLayout.SOUTH, beginChatButton, -10, SpringLayout.SOUTH, contentPane);
+        
+        layout.putConstraint(SpringLayout.WEST, joinChatButton, 10, SpringLayout.EAST, beginChatButton);
+        layout.putConstraint(SpringLayout.NORTH, joinChatButton, 10, SpringLayout.SOUTH, messageField);
+        layout.putConstraint(SpringLayout.SOUTH, joinChatButton, -10, SpringLayout.SOUTH, contentPane);
+        
+        layout.putConstraint(SpringLayout.WEST, endChatButton, 10, SpringLayout.EAST, joinChatButton);
+        layout.putConstraint(SpringLayout.NORTH, endChatButton, 10, SpringLayout.SOUTH, messageField);
+        layout.putConstraint(SpringLayout.SOUTH, endChatButton, -10, SpringLayout.SOUTH, contentPane);
     }
 }
