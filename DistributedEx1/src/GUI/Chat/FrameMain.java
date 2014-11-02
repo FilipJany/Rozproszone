@@ -5,12 +5,19 @@
  */
 package GUI.Chat;
 
+import Connection.Message;
+import Connection.TcpClient;
+import Connection.TcpServer;
 import java.awt.Container;
 import java.awt.Dimension;
-import java.util.List;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.net.InetAddress;
 import javax.swing.JButton;
 import javax.swing.JFrame;
-import javax.swing.JList;
+import javax.swing.JLabel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SpringLayout;
@@ -27,15 +34,23 @@ public class FrameMain
     private Container contentPane;
     private JTextArea mainArea;
     private JTextField messageField;
-    
-    
     private JButton beginChatButton, endChatButton, joinChatButton, sendButton;
+    private final int portNumber = 6666;
+    private String message;
+    private JLabel hiddenField;
+    private FrameMain frame;
+    
+    private InetAddress clientAddress;
+    private boolean isServer = false;
+    private TcpClient tcpClient;
+    private TcpServer tcpServer;
     
     public FrameMain(int width, int height)
     {
         this.width = width;
         this.height = height;
-        
+        message = "";
+        frame = this;
         InitAndShowFrame();
     }
     
@@ -64,13 +79,98 @@ public class FrameMain
         sendButton = new JButton("Send");
         sendButton.setPreferredSize(new Dimension(100, 40));
         sendButton.setEnabled(false);
+        sendButton.addActionListener(new ActionListener() 
+        {
+            @Override
+            public void actionPerformed(ActionEvent e) 
+            {
+                if(tcpServer != null)
+                {
+                    System.out.println("In server send");
+                    tcpServer.write("Server: " + messageField.getText());
+                    messageField.setText("");
+                }
+                if(tcpClient != null)
+                {
+                    System.out.println("In client send");
+                    tcpClient.sendMessage(new Message(1, "Client: " + messageField.getText()));
+                    messageField.setText("");
+                }
+            }
+        }); 
         beginChatButton = new JButton("Start Chat");
         beginChatButton.setPreferredSize(new Dimension(150, 40));
+        beginChatButton.addActionListener(new ActionListener() 
+        {
+            @Override
+            public void actionPerformed(ActionEvent e) 
+            {
+                tcpServer = new TcpServer(frame);
+                new ServerThread().start();
+                isServer = true;
+                messageField.setEditable(true);
+                sendButton.setEnabled(true);
+                endChatButton.setEnabled(true);
+                joinChatButton.setEnabled(false);
+                beginChatButton.setEnabled(false);
+            }
+        });
         joinChatButton = new JButton("Join Chat");
         joinChatButton.setPreferredSize(new Dimension(150, 40));
+        joinChatButton.addActionListener(new ActionListener() 
+        {
+            @Override
+            public void actionPerformed(ActionEvent e) 
+            {
+                AddressFrame sf = new AddressFrame(hiddenField);
+                //client creation in hidden field's property change listener
+            }
+        }); 
         endChatButton = new JButton("Disconnect");
         endChatButton.setPreferredSize(new Dimension(150, 40));
+        endChatButton.addActionListener(new ActionListener() 
+        {
+            @Override
+            public void actionPerformed(ActionEvent e) 
+            {
+                messageField.setEditable(false);
+                sendButton.setEnabled(false);
+                beginChatButton.setEnabled(true);
+                joinChatButton.setEnabled(true);
+                endChatButton.setEnabled(false);
+            }
+        }); 
         endChatButton.setEnabled(false);
+        
+        hiddenField = new JLabel();
+        hiddenField.addPropertyChangeListener("text", new PropertyChangeListener() 
+        {
+
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) 
+            {
+                try
+                {
+                    clientAddress = InetAddress.getByName(hiddenField.getText());
+                    if(clientAddress != null)
+                    {
+                        tcpClient = new TcpClient(clientAddress, frame);
+                        tcpClient.run();
+                        System.err.println(tcpClient);
+                        isServer = false;
+                        joinChatButton.setEnabled(false);
+                        beginChatButton.setEnabled(false);
+                        sendButton.setEnabled(true);
+                        messageField.setEditable(true);
+                        endChatButton.setEnabled(true);
+                    }
+                }
+                catch(Exception e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        }); 
         
         contentPane.add(mainArea);
         contentPane.add(messageField);
@@ -106,5 +206,19 @@ public class FrameMain
         layout.putConstraint(SpringLayout.WEST, endChatButton, 10, SpringLayout.EAST, joinChatButton);
         layout.putConstraint(SpringLayout.NORTH, endChatButton, 10, SpringLayout.SOUTH, messageField);
         layout.putConstraint(SpringLayout.SOUTH, endChatButton, -10, SpringLayout.SOUTH, contentPane);
+    }
+    
+    public JTextArea getChatArea()
+    {
+        return mainArea;
+    }
+    
+    class ServerThread extends Thread
+    {
+        @Override
+        public void run()
+        {
+            tcpServer.run();
+        }
     }
 }
