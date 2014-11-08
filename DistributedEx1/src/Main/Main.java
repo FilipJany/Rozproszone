@@ -13,8 +13,9 @@ import GUI.Chat.FrameMain;
  */
 public class Main 
 {
+    private static final boolean isUdp = true;
     public static void main(String[] args)
     {
-        FrameMain fm = new FrameMain(600, 400);
+        FrameMain fm = new FrameMain(600, 400, isUdp);
     }
 }

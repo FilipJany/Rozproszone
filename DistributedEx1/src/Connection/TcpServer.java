@@ -72,6 +72,29 @@ public class TcpServer
         }
     }
     
+    public synchronized void writeMessageObj(Message message)
+    {
+        if(mainFrame != null)
+        {
+            mainFrame.getChatArea().setText(mainFrame.getChatArea().getText() + message.getMessage() + "\n");
+            try
+            {
+                client.oos.writeObject(message);
+            }
+            catch(Exception e)
+            {
+                e.printStackTrace();
+            }
+        }
+    }
+    
+    public void closeConnection()
+    {
+        String endMsg = "Server has been shuted down!";
+        writeMessageObj(new Message(2, endMsg));
+        isRunning = false;
+    }
+    
     //class that is responsible for handling client connection management
     class ClientHandler extends Thread
     {
@@ -102,6 +125,10 @@ public class TcpServer
                 try
                 {
                     message = (Message)ois.readObject();
+                    if(message.getType() == 2)
+                    {
+                        mainFrame.serverOrClientClosedManageFields();
+                    }
                     write(message.getMessage());
                 }
                 catch(IOException | ClassNotFoundException e)

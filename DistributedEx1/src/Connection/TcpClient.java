@@ -58,6 +58,24 @@ public class TcpClient
         }
     }
     
+    public void closeConnection()
+    {
+        sendMessage(new Message(2, "Client disconnected!"));
+        try
+        {
+            if(oos != null)
+                oos.close();
+            if(ois != null)
+                ois.close();
+            if(socket != null)
+                socket.close();
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+    
     class ServerListener extends Thread
     {
         @Override
@@ -67,8 +85,10 @@ public class TcpClient
             {
                 try
                 {
-                    String msg = ((Message) ois.readObject()).getMessage();
-                    mainFrame.getChatArea().setText(mainFrame.getChatArea().getText() + msg + "\n");
+                    Message msg = (Message) ois.readObject();
+                    if(msg.getType() == 2)
+                        mainFrame.serverOrClientClosedManageFields();
+                    mainFrame.getChatArea().setText(mainFrame.getChatArea().getText() + msg.getMessage() + "\n");
                 }
                 catch(Exception e)
                 {

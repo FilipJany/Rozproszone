@@ -14,76 +14,58 @@ import javax.swing.JTextArea;
  *
  * @author filipjany
  */
-public class UdpClient 
+public class UdpClient implements Runnable
 {
-    private DatagramSocket socket;
-    private DatagramPacket packet;
-    private DatagramPacket incoming;
-    private final int port;
-    private InetAddress serverAddress;
-    private byte[] packetData;
-    private byte[] incomingData;
-    private final int PACKET_SIZE = 1024;
-    private JTextArea chatArea;
+    DatagramSocket theSocket = null;
+    InetAddress address;
+    JTextArea chatArea;
 
-    public UdpClient(int port, InetAddress serverAddress, JTextArea mainArea) 
+    @SuppressWarnings("CallToPrintStackTrace")
+    public UdpClient(InetAddress address, JTextArea chatArea)
     {
-        this.port = port;
-        this.serverAddress = serverAddress;
-        chatArea = mainArea;
-        System.out.println("Client started and listening on port: " + port + ".");
-        initClient();
-        startListener();
+        this.chatArea = chatArea;
+        this.address = address;
+        try
+        {
+            theSocket = new DatagramSocket();
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+        }
     }
     
-    
-    private void startListener()
+    @SuppressWarnings("CallToPrintStackTrace")
+    public void send(String message)
     {
-        Thread t = new Thread(new Runnable() 
+        try
         {
-            @Override
-            public void run() 
+            chatArea.setText(chatArea.getText() + message + "\n");
+            theSocket.send(new DatagramPacket(message.getBytes(), message.getBytes().length, address, 6666));
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    @SuppressWarnings({"ImplicitArrayToString", "CallToPrintStackTrace"})
+    public void run()
+    {
+        DatagramPacket recivedPacket = new DatagramPacket(new byte[100], 100);
+        while(true)
+        {
+            try
             {
-                incomingData = new byte[PACKET_SIZE];
-                incoming = new DatagramPacket(incomingData, incomingData.length);
-                try
-                {
-                    socket.receive(incoming);
-                    System.err.println("Bangla");
-                }
-                catch(Exception e)
-                {
-                    e.printStackTrace();
-                }
+                theSocket.receive(recivedPacket);
+                chatArea.setText(chatArea.getText() + new String(recivedPacket.getData()) + "\n");
+                System.out.println("Got: " + new String(recivedPacket.getData()));
             }
-        });
-        t.start();
-    }
-    
-    private void initClient()
-    {
-        try
-        {
-            socket = new DatagramSocket();
-        }
-        catch(Exception e)
-        {
-            e.printStackTrace();
-        }
-    }
-    
-    public void sendMessage(String message)
-    {
-        packetData = message.getBytes();
-        packet = new DatagramPacket(packetData, packetData.length, serverAddress, port);
-        try
-        {
-            socket.send(packet);
-            chatArea.setText(chatArea.getText() + "This: " + message + "\n");
-        }
-        catch(Exception e)
-        {
-            e.printStackTrace();
+            catch(Exception e)
+            {
+                e.printStackTrace();
+            }
         }
     }
 }

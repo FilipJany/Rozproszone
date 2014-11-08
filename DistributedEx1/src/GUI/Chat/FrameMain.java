@@ -8,6 +8,8 @@ package GUI.Chat;
 import Connection.Message;
 import Connection.TcpClient;
 import Connection.TcpServer;
+import Connection.UdpClient;
+import Connection.UdpServer;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -44,9 +46,13 @@ public class FrameMain
     private boolean isServer = false;
     private TcpClient tcpClient;
     private TcpServer tcpServer;
+    private UdpServer udpServer;
+    private UdpClient udpClient;
+    private boolean isUdp = false;
     
-    public FrameMain(int width, int height)
+    public FrameMain(int width, int height, boolean isUdp)
     {
+        this.isUdp = isUdp;
         this.width = width;
         this.height = height;
         message = "";
@@ -84,18 +90,33 @@ public class FrameMain
             @Override
             public void actionPerformed(ActionEvent e) 
             {
-                if(tcpServer != null)
+                if(!isUdp)
                 {
-                    System.out.println("In server send");
-                    tcpServer.write("Server: " + messageField.getText());
-                    messageField.setText("");
+                    if(tcpServer != null)
+                    {
+                        System.out.println("In server send");
+                        tcpServer.write("Server: " + messageField.getText());
+                    }
+                    if(tcpClient != null)
+                    {
+                        System.out.println("In client send");
+                        tcpClient.sendMessage(new Message(1, "Client: " + messageField.getText()));
+                    }
                 }
-                if(tcpClient != null)
+                else
                 {
-                    System.out.println("In client send");
-                    tcpClient.sendMessage(new Message(1, "Client: " + messageField.getText()));
-                    messageField.setText("");
+                    if(udpServer != null)
+                    {
+                        System.out.println("in udp server send");
+                        udpServer.send("Server: " + messageField.getText());
+                    }
+                    if(udpClient != null)
+                    {
+                        System.out.println("in udp client send");
+                        udpClient.send("Client: " + messageField.getText());
+                    }
                 }
+                messageField.setText("");
             }
         }); 
         beginChatButton = new JButton("Start Chat");
@@ -105,8 +126,23 @@ public class FrameMain
             @Override
             public void actionPerformed(ActionEvent e) 
             {
-                tcpServer = new TcpServer(frame);
-                new ServerThread().start();
+                if(!isUdp)
+                {
+                    tcpServer = new TcpServer(frame);
+                    new ServerThread().start();
+                }
+                else
+                {
+                    try
+                    {
+                        udpServer = new UdpServer(InetAddress.getByName("localhost"), mainArea);
+                        new Thread(udpServer).start();
+                    }
+                    catch(Exception e2)
+                    {
+                        e2.printStackTrace();
+                    }
+                }
                 isServer = true;
                 messageField.setEditable(true);
                 sendButton.setEnabled(true);
@@ -133,6 +169,19 @@ public class FrameMain
             @Override
             public void actionPerformed(ActionEvent e) 
             {
+                if(!isUdp)
+                {
+                    if(tcpServer != null)
+                        tcpServer.closeConnection();
+                    if(tcpClient != null)
+                        tcpClient.closeConnection();
+                }
+                else
+                {
+                    if(udpServer != null);
+                        
+                    if(udpClient != null);
+                }
                 messageField.setEditable(false);
                 sendButton.setEnabled(false);
                 beginChatButton.setEnabled(true);
@@ -154,9 +203,17 @@ public class FrameMain
                     clientAddress = InetAddress.getByName(hiddenField.getText());
                     if(clientAddress != null)
                     {
-                        tcpClient = new TcpClient(clientAddress, frame);
-                        tcpClient.run();
-                        System.err.println(tcpClient);
+                        if(!isUdp)
+                        {
+                            tcpClient = new TcpClient(clientAddress, frame);
+                            tcpClient.run();
+                        }
+                        else
+                        {
+                            udpClient = new UdpClient(InetAddress.getByName("localhost"), mainArea);
+                            new Thread(udpClient).start();
+                        }
+                        
                         isServer = false;
                         joinChatButton.setEnabled(false);
                         beginChatButton.setEnabled(false);
@@ -206,6 +263,15 @@ public class FrameMain
         layout.putConstraint(SpringLayout.WEST, endChatButton, 10, SpringLayout.EAST, joinChatButton);
         layout.putConstraint(SpringLayout.NORTH, endChatButton, 10, SpringLayout.SOUTH, messageField);
         layout.putConstraint(SpringLayout.SOUTH, endChatButton, -10, SpringLayout.SOUTH, contentPane);
+    }
+    
+    public void serverOrClientClosedManageFields()
+    {
+        messageField.setEditable(false);
+        sendButton.setEnabled(false);
+        beginChatButton.setEnabled(true);
+        joinChatButton.setEnabled(true);
+        endChatButton.setEnabled(false);
     }
     
     public JTextArea getChatArea()
