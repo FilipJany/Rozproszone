@@ -6,7 +6,6 @@
 package Connection;
 
 import GUI.Chat.FrameMain;
-import com.sun.security.ntlm.Client;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.InetAddress;

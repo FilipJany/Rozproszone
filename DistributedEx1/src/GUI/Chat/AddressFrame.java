@@ -12,7 +12,7 @@ import java.awt.event.ActionListener;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JTextArea;
+import javax.swing.JTextField;
 import javax.swing.SpringLayout;
 
 /**
@@ -23,7 +23,7 @@ public class AddressFrame extends JFrame
 {
     private final int width = 300, height = 160;
     private JLabel descr;
-    private JTextArea addressArea;
+    private JTextField addressArea;
     private JButton okButton, cancelButton;
     private SpringLayout layout;
     private Container contentPane;
@@ -40,6 +40,7 @@ public class AddressFrame extends JFrame
         setBounds(100, 100, width, height);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         initAndDrawFields();
+        setResizable(false);
         setVisible(true);
     }
     
@@ -50,9 +51,16 @@ public class AddressFrame extends JFrame
         contentPane = getContentPane();
         
         descr = new JLabel("Enter server address: ");
-        descr.setPreferredSize(new Dimension(100, 40));
-        addressArea = new JTextArea();
+        descr.setPreferredSize(new Dimension(100, 20));
+        addressArea = new JTextField();
         addressArea.setPreferredSize(new Dimension(280, 40));
+        addressArea.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                okButton.doClick();
+            }
+        });
         okButton = new JButton("Connect");
         okButton.setPreferredSize(new Dimension(100, 40));
         okButton.addActionListener(new ActionListener() 
@@ -65,8 +73,11 @@ public class AddressFrame extends JFrame
                     hiddenField.setText(addressArea.getText());
                     dispose();
                 }
-                else
+                else {
                     addressArea.setText("Please provide address or click 'Cancel'!");
+                    addressArea.requestFocusInWindow();
+                    addressArea.selectAll();
+                }
             }
         }); 
         cancelButton = new JButton("Cancel");
@@ -90,16 +101,13 @@ public class AddressFrame extends JFrame
         layout.putConstraint(SpringLayout.EAST, descr, -10, SpringLayout.EAST, contentPane);
         
         layout.putConstraint(SpringLayout.NORTH, addressArea, 10, SpringLayout.SOUTH, descr);
-        layout.putConstraint(SpringLayout.WEST, addressArea, 10, SpringLayout.WEST, contentPane);
+        layout.putConstraint(SpringLayout.HORIZONTAL_CENTER, addressArea, 0, SpringLayout.HORIZONTAL_CENTER, contentPane);
         layout.putConstraint(SpringLayout.EAST, addressArea, -10, SpringLayout.EAST, contentPane);
         
-        layout.putConstraint(SpringLayout.NORTH, cancelButton, 10, SpringLayout.SOUTH, addressArea);
-        layout.putConstraint(SpringLayout.WEST, cancelButton, 30, SpringLayout.WEST, contentPane);
+        layout.putConstraint(SpringLayout.WEST, cancelButton, 10, SpringLayout.WEST, contentPane);
         layout.putConstraint(SpringLayout.SOUTH, cancelButton, -10, SpringLayout.SOUTH, contentPane);
         
-        layout.putConstraint(SpringLayout.NORTH, okButton, 10, SpringLayout.SOUTH, addressArea);
-        layout.putConstraint(SpringLayout.WEST, okButton, 30, SpringLayout.EAST, cancelButton);
-        layout.putConstraint(SpringLayout.EAST, okButton, -30, SpringLayout.EAST, contentPane);
+        layout.putConstraint(SpringLayout.EAST, okButton, -10, SpringLayout.EAST, contentPane);
         layout.putConstraint(SpringLayout.SOUTH, okButton, -10, SpringLayout.SOUTH, contentPane);
     }
 }
