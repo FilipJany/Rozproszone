@@ -9,6 +9,8 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.util.ArrayList;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
 
 /**
@@ -21,7 +23,7 @@ public class UdpClient implements Runnable
     InetAddress address;
     JTextArea chatArea;
     private final int currentMessageNumber = 0;
-    final int PACKAGE_SIZE = 100;
+    final int PACKAGE_SIZE = 200;
     ArrayList<Message> messagesToSend;
 
     @SuppressWarnings("CallToPrintStackTrace")
@@ -55,14 +57,14 @@ public class UdpClient implements Runnable
                 for(int i = 0; i < messagesToSend.size(); i++)
                 {
                     if(!messagesToSend.get(i).getMessage().contains("##hello##"))
-                        chatArea.setText(chatArea.getText() + messagesToSend.get(i).getMessage());
+                        chatArea.setText(chatArea.getText() + messagesToSend.get(i).getMessage() + "\n");
                     theSocket.send(new DatagramPacket(CommonMethods.getObjectBytes(messagesToSend.get(i)), CommonMethods.getObjectBytes(messagesToSend.get(i)).length, address, 6666));
                 }
             }
             else if(strings.size() == 1)
             {
                 if(!messagesToSend.get(0).getMessage().contains("##hello##"))
-                        chatArea.setText(chatArea.getText() + messagesToSend.get(0).getMessage());
+                        chatArea.setText(chatArea.getText() + messagesToSend.get(0).getMessage() + "\n");
                 theSocket.send(new DatagramPacket(CommonMethods.getObjectBytes(messagesToSend.get(0)), CommonMethods.getObjectBytes(messagesToSend.get(0)).length, address, 6666));
             }
             messagesToSend.clear();
@@ -78,6 +80,8 @@ public class UdpClient implements Runnable
         try
         {
             theSocket.close();
+            if(theSocket.isClosed())
+                JOptionPane.showMessageDialog(new JFrame(), "You have closed connection successfully!", "Information", JOptionPane.ERROR_MESSAGE);
         }
         catch(Exception e)
         {
@@ -89,7 +93,7 @@ public class UdpClient implements Runnable
     @SuppressWarnings({"ImplicitArrayToString", "CallToPrintStackTrace"})
     public void run()
     {
-        DatagramPacket recivedPacket = new DatagramPacket(new byte[200], 200);
+        DatagramPacket recivedPacket = new DatagramPacket(new byte[PACKAGE_SIZE], PACKAGE_SIZE);
         String wholeMessage = "";
         while(true)
         {
@@ -99,7 +103,13 @@ public class UdpClient implements Runnable
                 //firstPacket = new DatagramPacket(recivedPacket.getData(), recivedPacket.getData().length, recivedPacket.getAddress(), recivedPacket.getPort());
                 Message m = CommonMethods.getObjectFromBytes(recivedPacket.getData());
                 if(!m.getMessage().contains("##hello##"))
-                        chatArea.setText(chatArea.getText() + m.getMessage());
+                {
+                    if(m.getMessage().contains("Server"))
+                        chatArea.setText(chatArea.getText() + m.getMessage().substring(0, 6) + "(" + m.getMessageNumber() + ")" + m.getMessage().substring(7) + "\n");
+                    else
+                        chatArea.setText(chatArea.getText() + "Server(" + m.getMessageNumber() + "):" + m.getMessage() + "\n");
+                }
+                    
                 //recivedPacket = new DatagramPacket(new byte[200], 200);
                 //theSocket.send(new DatagramPacket("Recived message".getBytes(), "Recived message".getBytes().length, firstPacket.getAddress(), firstPacket.getPort()));
             }

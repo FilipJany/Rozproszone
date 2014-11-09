@@ -4,6 +4,8 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.util.ArrayList;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
 
 /**
@@ -51,7 +53,7 @@ public class UdpServer implements Runnable
                 for(int i = 0; i < messagesToSend.size(); i++)
                 {
                     if(!messagesToSend.get(i).getMessage().contains("##hello##"))
-                        chatArea.setText(chatArea.getText() + messagesToSend.get(i).getMessage());
+                        chatArea.setText(chatArea.getText() + messagesToSend.get(i).getMessage() + "\n");
                     theSocket.send(new DatagramPacket(CommonMethods.getObjectBytes(messagesToSend.get(i)), CommonMethods.getObjectBytes(messagesToSend.get(i)).length, 
                             firstPacket.getAddress(), firstPacket.getPort()));
                 }
@@ -59,7 +61,7 @@ public class UdpServer implements Runnable
             else if(strings.size() == 1)
             {
                 if(!messagesToSend.get(0).getMessage().contains("##hello##"))
-                        chatArea.setText(chatArea.getText() + messagesToSend.get(0).getMessage());
+                        chatArea.setText(chatArea.getText() + messagesToSend.get(0).getMessage() + "\n");
                 theSocket.send(new DatagramPacket(CommonMethods.getObjectBytes(messagesToSend.get(0)), CommonMethods.getObjectBytes(messagesToSend.get(0)).length, 
                         firstPacket.getAddress(), firstPacket.getPort()));
             }
@@ -76,6 +78,8 @@ public class UdpServer implements Runnable
         try
         {
             theSocket.close();
+            if(theSocket.isClosed())
+                JOptionPane.showMessageDialog(new JFrame(), "You have closed connection successfully!", "Information", JOptionPane.ERROR_MESSAGE);
         }
         catch(Exception e)
         {
@@ -98,7 +102,12 @@ public class UdpServer implements Runnable
                 Message m = CommonMethods.getObjectFromBytes(recivedPacket.getData());
                 System.out.print(m.getMessage());
                 if(!m.getMessage().contains("##hello##"))
-                        chatArea.setText(chatArea.getText() + m.getMessage());
+                {
+                    if(m.getMessage().contains("Client"))
+                        chatArea.setText(chatArea.getText() + m.getMessage().substring(0, 6) + "(" + m.getMessageNumber() + ")" + m.getMessage().substring(7) + "\n");
+                    else
+                        chatArea.setText(chatArea.getText() + "Client(" + m.getMessageNumber() + "):" + m.getMessage() + "\n");
+                }
                 //recivedPacket = new DatagramPacket(new byte[200], 200);
                 //theSocket.send(new DatagramPacket("Recived message".getBytes(), "Recived message".getBytes().length, firstPacket.getAddress(), firstPacket.getPort()));
             }

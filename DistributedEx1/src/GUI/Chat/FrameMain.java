@@ -106,11 +106,11 @@ public class FrameMain {
                 } else {
                     if (udpServer != null) {
                         System.out.println("in udp server send");
-                        udpServer.send("Server: " + messageField.getText() + "\n");
+                        udpServer.send("Server: " + messageField.getText());
                     }
                     if (udpClient != null) {
                         System.out.println("in udp client send");
-                        udpClient.send("Client: " + messageField.getText() + "\n");
+                        udpClient.send("Client: " + messageField.getText());
                     }
                 }
                 messageField.setText("");
@@ -134,7 +134,7 @@ public class FrameMain {
                     new ServerThread().start();
                 } else {
                     try {
-                        udpServer = new UdpServer(InetAddress.getByName("127.0.0.1"), mainArea);
+                        udpServer = new UdpServer(InetAddress.getByName(InetAddress.getLocalHost().getHostAddress()), mainArea);
                         new Thread(udpServer).start();
                     } catch (Exception e2) {
                         e2.printStackTrace();
@@ -174,9 +174,10 @@ public class FrameMain {
                         tcpClient.closeConnection();
                 } else 
                 {
-                    if (udpServer != null);
-                        
-                    if (udpClient != null);
+                    if (udpServer != null)
+                        udpServer.closeConnection();
+                    if (udpClient != null)
+                        udpClient.closeConnection();
                 }
                 messageField.setEditable(false);
                 sendButton.setEnabled(false);
@@ -222,7 +223,7 @@ public class FrameMain {
         contentPane.add(sendButton);
         contentPane.add(beginChatButton);
         contentPane.add(joinChatButton);
-        contentPane.add(endChatButton);
+        //contentPane.add(endChatButton);
 
         layout.putConstraint(SpringLayout.WEST, mainArea, 10, SpringLayout.WEST, contentPane);
         layout.putConstraint(SpringLayout.NORTH, mainArea, 10, SpringLayout.NORTH, contentPane);
