@@ -97,20 +97,20 @@ public class FrameMain {
                 if (!isUdp) {
                     if (tcpServer != null) {
                         System.out.println("In server send");
-                        tcpServer.write("Server: " + messageField.getText());
+                        tcpServer.write("Server: " + messageField.getText() + "\n");
                     }
                     if (tcpClient != null) {
                         System.out.println("In client send");
-                        tcpClient.sendMessage(new Message(1, "Client: " + messageField.getText()));
+                        tcpClient.sendMessage(new Message(1, "Client: " + messageField.getText() + "\n"));
                     }
                 } else {
                     if (udpServer != null) {
                         System.out.println("in udp server send");
-                        udpServer.send("Server: " + messageField.getText());
+                        udpServer.send("Server: " + messageField.getText() + "\n");
                     }
                     if (udpClient != null) {
                         System.out.println("in udp client send");
-                        udpClient.send("Client: " + messageField.getText());
+                        udpClient.send("Client: " + messageField.getText() + "\n");
                     }
                 }
                 messageField.setText("");
@@ -134,7 +134,7 @@ public class FrameMain {
                     new ServerThread().start();
                 } else {
                     try {
-                        udpServer = new UdpServer(InetAddress.getByName("localhost"), mainArea);
+                        udpServer = new UdpServer(InetAddress.getByName(InetAddress.getLocalHost().getHostAddress()), mainArea);
                         new Thread(udpServer).start();
                     } catch (Exception e2) {
                         e2.printStackTrace();
@@ -151,7 +151,8 @@ public class FrameMain {
         });
         joinChatButton = new JButton("Join Chat");
         joinChatButton.setPreferredSize(new Dimension(150, 40));
-        joinChatButton.addActionListener(new ActionListener() {
+        joinChatButton.addActionListener(new ActionListener() 
+        {
             @Override
             public void actionPerformed(ActionEvent e) {
                 AddressFrame sf = new AddressFrame(hiddenField);
@@ -160,17 +161,21 @@ public class FrameMain {
         });
         endChatButton = new JButton("Disconnect");
         endChatButton.setPreferredSize(new Dimension(150, 40));
-        endChatButton.addActionListener(new ActionListener() {
+        endChatButton.addActionListener(new ActionListener() 
+        {
             @Override
-            public void actionPerformed(ActionEvent e) {
-                if (!isUdp) {
+            public void actionPerformed(ActionEvent e) 
+            {
+                if (!isUdp) 
+                {
                     if (tcpServer != null)
                         tcpServer.closeConnection();
                     if (tcpClient != null)
                         tcpClient.closeConnection();
-                } else {
+                } else 
+                {
                     if (udpServer != null);
-
+                        
                     if (udpClient != null);
                 }
                 messageField.setEditable(false);
@@ -194,8 +199,9 @@ public class FrameMain {
                             tcpClient = new TcpClient(clientAddress, frame);
                             tcpClient.run();
                         } else {
-                            udpClient = new UdpClient(InetAddress.getByName("localhost"), mainArea);
+                            udpClient = new UdpClient(clientAddress, mainArea);
                             new Thread(udpClient).start();
+                            udpClient.send("##hello##");
                         }
 
                         isServer = false;

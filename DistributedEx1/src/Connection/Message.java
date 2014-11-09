@@ -8,14 +8,33 @@ import java.io.Serializable;
  */
 public class Message implements Serializable
 {
-    static final int USERIN = 0, MESSAGE = 1, USEROUT = 2;
     private final int type;
     private final String message;
+    private int messageNumber;
+    private int totalMessageCount;
     
     public Message(int type, String message)
     {
         this.type = type;
         this.message = message;
+    }
+    
+    public Message(int type, String message, int messageNumber, int totalMessages)
+    {
+        this.type = type;
+        this.message = message;
+        this.messageNumber = messageNumber;
+        this.totalMessageCount = totalMessages;
+    }
+    
+    public int getTotalMessagesCount()
+    {
+        return totalMessageCount;
+    }
+    
+    public int getMessageNumber()
+    {
+        return messageNumber;
     }
     
     public int getType()
