@@ -20,7 +20,7 @@ import java.util.Arrays;
  */
 public class CommonMethods 
 {
-    private static final int PACKAGE_SIZE = 150;
+    private static final int PACKAGE_SIZE = 200;
     private static final int OBJECT_SIZE = 128;
     
     public static byte[] getObjectBytes(Message object)

@@ -3,9 +3,8 @@ package Connection;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import javax.swing.JTextArea;
-import Connection.CommonMethods;
 import java.util.ArrayList;
+import javax.swing.JTextArea;
 
 /**
  *
@@ -16,7 +15,7 @@ public class UdpServer implements Runnable
     DatagramSocket theSocket = null;
     DatagramPacket firstPacket;
     InetAddress address;
-    private final int PACKAGE_SIZE = 100;//message size - 128
+    private final int PACKAGE_SIZE = 200;//message size - 128
     JTextArea chatArea;
     private final int currentMessageNumber = 0;
     ArrayList<Message> messagesToSend;
@@ -88,7 +87,7 @@ public class UdpServer implements Runnable
     @SuppressWarnings({"ImplicitArrayToString", "CallToPrintStackTrace"})
     public void run()
     {
-        DatagramPacket recivedPacket = new DatagramPacket(new byte[200], 200);
+        DatagramPacket recivedPacket = new DatagramPacket(new byte[PACKAGE_SIZE], PACKAGE_SIZE);
         String wholeMessage = "";
         while(true)
         {

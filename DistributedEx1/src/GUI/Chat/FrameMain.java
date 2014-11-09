@@ -134,7 +134,7 @@ public class FrameMain {
                     new ServerThread().start();
                 } else {
                     try {
-                        udpServer = new UdpServer(InetAddress.getByName(InetAddress.getLocalHost().getHostAddress()), mainArea);
+                        udpServer = new UdpServer(InetAddress.getByName("127.0.0.1"), mainArea);
                         new Thread(udpServer).start();
                     } catch (Exception e2) {
                         e2.printStackTrace();
