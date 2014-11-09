@@ -97,11 +97,11 @@ public class FrameMain {
                 if (!isUdp) {
                     if (tcpServer != null) {
                         System.out.println("In server send");
-                        tcpServer.write("Server: " + messageField.getText() + "\n");
+                        tcpServer.write("Server: " + messageField.getText());
                     }
                     if (tcpClient != null) {
                         System.out.println("In client send");
-                        tcpClient.sendMessage(new Message(1, "Client: " + messageField.getText() + "\n"));
+                        tcpClient.sendMessage(new Message(1, "Client: " + messageField.getText()));
                     }
                 } else {
                     if (udpServer != null) {

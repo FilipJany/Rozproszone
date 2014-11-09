@@ -8,7 +8,7 @@ import GUI.Chat.FrameMain;
  */
 public class DistributedEx1 
 {
-    private static final boolean isUdp = true;
+    private static final boolean isUdp = false;
     public static void main(String[] args)
     {
         FrameMain fm = new FrameMain(600, 400, isUdp);
